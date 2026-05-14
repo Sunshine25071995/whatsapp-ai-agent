@@ -3,9 +3,9 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import makeWASocket from "@whiskeysockets/baileys";
 import * as Baileys from "@whiskeysockets/baileys";
 const { 
+  default: makeWASocket,
   DisconnectReason, 
   fetchLatestBaileysVersion, 
   useMultiFileAuthState, 
@@ -24,7 +24,7 @@ async function startServer() {
   const app = express();
   const httpServer = createServer(app);
   const io = new Server(httpServer);
-  const PORT = process.env.PORT || 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   let sock: any = null;
   let qrCode: string | null = null;
