@@ -52,18 +52,22 @@ async function startServer() {
       if (connection === 'close') {
         const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
         const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-        console.log('Connection closed due to ', lastDisconnect?.error, ', reconnecting ', shouldReconnect);
+        const reason = (lastDisconnect?.error as Boom)?.message || 'Unknown reason';
+        
+        console.log(`Connection closed. Status: ${statusCode}, Reason: ${reason}, Reconnecting: ${shouldReconnect}`);
         
         connectionStatus = 'close';
         io.emit('status', { status: 'close' });
 
         if (shouldReconnect) {
-          console.log('Wait 5s before reconnecting...');
+          // Add random jitter to avoid rapid retry cycles
+          const delayMs = 5000 + Math.random() * 5000;
+          console.log(`Waiting ${Math.floor(delayMs)}ms before reconnecting...`);
           setTimeout(() => {
             connectToWhatsApp();
-          }, 5000);
+          }, delayMs);
         } else {
-          console.log('Logged out, clearing session...');
+          console.log('Logged out. Session cleared.');
           if (fs.existsSync('auth_info')) {
              fs.rmSync('auth_info', { recursive: true, force: true });
           }

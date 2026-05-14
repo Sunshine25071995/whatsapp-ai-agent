@@ -80,8 +80,8 @@ export default function App() {
       };
       
       setLogs(prev => {
-        const exists = prev.find(l => l.id === msg.id);
-        if (exists) return prev;
+        // Use a more robust check for duplicates
+        if (prev.some(l => l.id === msg.id)) return prev;
         return [newLog, ...prev].slice(0, 50);
       });
 
@@ -90,16 +90,17 @@ export default function App() {
           // Get or create history for this user
           const history = chatHistories.current.get(msg.from) || [];
           
-          const chat = aiRef.current.chats.create({
+          const model = aiRef.current.getGenerativeModel({ 
             model: "gemini-1.5-flash",
-            config: {
-              systemInstruction: systemPrompt
-            },
+            systemInstruction: systemPrompt
+          });
+
+          const chat = model.startChat({
             history: history
           });
 
-          const result = await chat.sendMessage({ message: msg.text });
-          const replyText = result.text || "I'm sorry, I couldn't generate a response.";
+          const result = await chat.sendMessage(msg.text);
+          const replyText = result.response.text() || "I'm sorry, I couldn't generate a response.";
 
           // Update local history (keep last 10 messages for memory)
           const updatedHistory = [
@@ -216,8 +217,8 @@ export default function App() {
             <div className="mt-8 space-y-4">
               <h2 className="text-xs font-bold text-slate-500 uppercase tracking-[0.2em]">Flow Highlights</h2>
               <div className="space-y-2">
-                {logs.slice(0, 3).map((log) => (
-                  <div key={log.id} className="p-3 hover:bg-white/5 border border-transparent rounded-xl flex items-center gap-3 transition-colors cursor-pointer group">
+                {logs.slice(0, 3).map((log, idx) => (
+                  <div key={`${log.id}-sidebar-${idx}`} className="p-3 hover:bg-white/5 border border-transparent rounded-xl flex items-center gap-3 transition-colors cursor-pointer group">
                     <div className="w-8 h-8 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-[10px] font-bold text-slate-500 uppercase">
                       {log.pushName.slice(0, 2)}
                     </div>
@@ -268,9 +269,9 @@ export default function App() {
                     <p className="text-sm font-medium">Listening for messages...</p>
                   </div>
                 ) : (
-                  [...logs].reverse().map((log) => (
+                  [...logs].reverse().map((log, idx) => (
                     <motion.div
-                      key={log.id}
+                      key={`${log.id}-${idx}`}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       className="flex flex-col gap-4"
