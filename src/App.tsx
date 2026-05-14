@@ -91,7 +91,7 @@ export default function App() {
           const history = chatHistories.current.get(msg.from) || [];
           
           const chat = aiRef.current.chats.create({
-            model: "gemini-3-flash-preview",
+            model: "gemini-1.5-flash",
             config: {
               systemInstruction: systemPrompt
             },
