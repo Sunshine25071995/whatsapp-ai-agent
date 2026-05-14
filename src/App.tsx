@@ -177,36 +177,36 @@ export default function App() {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
           {/* Connection Status Card */}
-          <div className="xl:col-span-1 space-y-8">
-            <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-8 backdrop-blur-xl">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-indigo-400" />
+          <div className="xl:col-span-1 space-y-6 lg:space-y-8">
+            <div className="bg-slate-900/50 border border-white/5 rounded-3xl p-6 lg:p-8 backdrop-blur-xl">
+              <div className="flex items-center gap-4 mb-6 lg:mb-8">
+                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
+                  <Zap className="w-5 h-5 lg:w-6 lg:h-6 text-indigo-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">Connection</h3>
-                  <p className="text-sm text-slate-500">Scan QR to link account</p>
+                  <h3 className="font-bold text-base lg:text-lg">Connection</h3>
+                  <p className="text-xs lg:text-sm text-slate-500">Scan QR to link account</p>
                 </div>
               </div>
 
-              <div className="aspect-square bg-slate-800/50 rounded-2xl border-2 border-dashed border-white/10 flex items-center justify-center relative overflow-hidden group">
+              <div className="aspect-square bg-slate-800/50 rounded-2xl border-2 border-dashed border-white/10 flex items-center justify-center relative overflow-hidden group max-w-[300px] mx-auto xl:max-w-none">
                 {qr && status !== 'open' ? (
-                  <div className="bg-white p-4 rounded-xl shadow-2xl transition-transform group-hover:scale-105 duration-500">
-                    <QRCodeSVG value={qr} size={200} />
+                  <div className="bg-white p-3 lg:p-4 rounded-xl shadow-2xl transition-transform group-hover:scale-105 duration-500">
+                    <QRCodeSVG value={qr} size={180} />
                   </div>
                 ) : status === 'open' ? (
                   <div className="text-center space-y-4">
-                    <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto">
-                      <CheckCircle2 className="w-10 h-10 text-emerald-500" />
+                    <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto">
+                      <CheckCircle2 className="w-8 h-8 lg:w-10 lg:h-10 text-emerald-500" />
                     </div>
-                    <p className="font-bold text-emerald-500">Active & Connected</p>
+                    <p className="font-bold text-emerald-500 text-sm lg:text-base">Active & Connected</p>
                   </div>
                 ) : (
                   <div className="text-center space-y-4 text-slate-500">
-                    <Loader2 className="w-10 h-10 animate-spin mx-auto opacity-20" />
-                    <p className="text-xs uppercase tracking-widest font-medium">Waiting for system...</p>
+                    <Loader2 className="w-8 h-8 lg:w-10 lg:h-10 animate-spin mx-auto opacity-20" />
+                    <p className="text-[10px] uppercase tracking-widest font-medium">Waiting for system...</p>
                   </div>
                 )}
               </div>
@@ -215,27 +215,27 @@ export default function App() {
 
           {/* Live Feed Card */}
           <div className="xl:col-span-2">
-            <div className="bg-slate-900/50 border border-white/5 rounded-3xl backdrop-blur-xl h-full flex flex-col overflow-hidden">
-              <div className="p-8 border-b border-white/5 flex items-center justify-between bg-white/5">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center">
-                    <Terminal className="w-5 h-5 text-slate-400" />
+            <div className="bg-slate-900/50 border border-white/5 rounded-3xl backdrop-blur-xl h-[600px] xl:h-full flex flex-col overflow-hidden">
+              <div className="p-6 lg:p-8 border-b border-white/5 flex items-center justify-between bg-white/5">
+                <div className="flex items-center gap-3 lg:gap-4">
+                  <div className="w-9 h-9 lg:w-10 lg:h-10 rounded-xl bg-slate-800 flex items-center justify-center">
+                    <Terminal className="w-4 h-4 lg:w-5 lg:h-5 text-slate-400" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg">Live Activity</h3>
-                    <p className="text-sm text-slate-500">Real-time message monitoring</p>
+                    <h3 className="font-bold text-base lg:text-lg">Live Activity</h3>
+                    <p className="text-xs lg:text-sm text-slate-500">Real-time message monitoring</p>
                   </div>
                 </div>
-                <div className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-wider border border-white/5">
-                  {logs.length} events
+                <div className="px-2 py-1 lg:px-3 lg:py-1 bg-white/5 rounded-full text-[10px] font-bold text-slate-400 uppercase tracking-wider border border-white/5">
+                  {logs.length}
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-8 space-y-4 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-4 custom-scrollbar">
                 {logs.length === 0 ? (
                   <div className="h-full flex flex-col items-center justify-center text-slate-600 space-y-4">
-                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-slate-800 flex items-center justify-center">
-                      <MessageSquare className="w-8 h-8 opacity-20" />
+                    <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full border-2 border-dashed border-slate-800 flex items-center justify-center">
+                      <MessageSquare className="w-6 h-6 lg:w-8 lg:h-8 opacity-20" />
                     </div>
                     <p className="text-sm font-medium">Listening for messages...</p>
                   </div>
@@ -243,28 +243,28 @@ export default function App() {
                   logs.map((log, idx) => (
                     <motion.div
                       key={`${log.id}-${idx}`}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
                       className="flex flex-col gap-4"
                     >
-                      <div className={`flex items-start gap-4 p-4 rounded-2xl border ${
+                      <div className={`flex items-start gap-3 lg:gap-4 p-3 lg:p-4 rounded-2xl border ${
                         log.type === 'incoming' 
                           ? 'bg-slate-800/30 border-white/5 hover:border-indigo-500/30' 
                           : 'bg-indigo-500/5 border-indigo-500/20'
                       } transition-all group`}>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                        <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-xl flex items-center justify-center shrink-0 ${
                           log.type === 'incoming' ? 'bg-slate-700' : 'bg-indigo-600'
                         }`}>
-                          <User className="w-5 h-5 text-indigo-100" />
+                          <User className="w-4 h-4 lg:w-5 lg:h-5 text-indigo-100" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-bold text-sm truncate pr-2">
-                              {log.pushName} <span className="text-slate-500 font-normal ml-2">@{log.from.split('@')[0]}</span>
+                            <span className="font-bold text-xs lg:text-sm truncate pr-2">
+                              {log.pushName} <span className="hidden sm:inline text-slate-500 font-normal ml-2">@{log.from.split('@')[0]}</span>
                             </span>
                             <span className="text-[10px] font-medium text-slate-500 shrink-0">{log.receivedAt}</span>
                           </div>
-                          <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">{log.text}</p>
+                          <p className="text-slate-300 text-xs lg:text-sm leading-relaxed whitespace-pre-wrap break-words">{log.text}</p>
                         </div>
                       </div>
                     </motion.div>

@@ -224,9 +224,10 @@ async function startServer() {
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     });
   } else {
-    app.use(express.static(path.resolve(__dirname)));
+    const distPath = path.resolve(process.cwd(), 'dist');
+    app.use(express.static(distPath));
     app.get('*', (req, res) => {
-      res.sendFile(path.resolve(__dirname, 'index.html'));
+      res.sendFile(path.resolve(distPath, 'index.html'));
     });
   }
 
