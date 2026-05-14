@@ -79,25 +79,27 @@ export default function App() {
         status: isAiEnabled ? 'processing' : 'received'
       };
       
-      setLogs(prev => [newLog, ...prev].slice(0, 50));
+      setLogs(prev => {
+        const exists = prev.find(l => l.id === msg.id);
+        if (exists) return prev;
+        return [newLog, ...prev].slice(0, 50);
+      });
 
       if (isAiEnabled && aiRef.current) {
         try {
           // Get or create history for this user
           const history = chatHistories.current.get(msg.from) || [];
           
-          const model = aiRef.current.getGenerativeModel({ 
-            model: "gemini-1.5-flash", 
-            systemInstruction: systemPrompt 
+          const chat = aiRef.current.chats.create({
+            model: "gemini-3-flash-preview",
+            config: {
+              systemInstruction: systemPrompt
+            },
+            history: history
           });
 
-          // Create a chat session with history
-          const chat = model.startChat({
-            history: history,
-          });
-
-          const result = await chat.sendMessage(msg.text);
-          const replyText = result.response.text();
+          const result = await chat.sendMessage({ message: msg.text });
+          const replyText = result.text || "I'm sorry, I couldn't generate a response.";
 
           // Update local history (keep last 10 messages for memory)
           const updatedHistory = [
