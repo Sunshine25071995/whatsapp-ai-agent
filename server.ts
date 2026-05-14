@@ -13,7 +13,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Handle different import styles for Baileys
 const Baileys = (BaileysModule as any).default || BaileysModule;
-const makeWASocket = Baileys.default || Baileys;
+const makeWASocket = typeof Baileys === 'function' ? Baileys : (Baileys.default || Baileys);
 
 const { 
   DisconnectReason, 
@@ -31,6 +31,12 @@ const isProd = process.env.NODE_ENV === 'production';
 
 // Initialize Gemini
 const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
+if (genAI) {
+  console.log("Gemini AI initialized successfully with API Key");
+} else {
+  console.warn("GEMINI_API_KEY not found in environment variables");
+}
+
 const systemPrompt = `You are a helpful and professional WhatsApp AI assistant. 
 Keep your replies concise, friendly, and helpful. 
 You are managing the user's chats automatically.`;
@@ -195,6 +201,7 @@ async function connectToWhatsApp() {
 // Socket communication for AI Reply
 io.on('connection', (socket) => {
   socket.emit('status', { status: connectionStatus });
+  socket.emit('system-info', { geminiAvailable: !!genAI });
   if (qrCode) socket.emit('qr', qrCode);
 
   socket.on('ai-reply', async ({ to, text }) => {
@@ -217,9 +224,9 @@ async function startServer() {
       res.status(200).set({ 'Content-Type': 'text/html' }).end(html);
     });
   } else {
-    app.use(express.static(path.resolve(__dirname, 'dist')));
+    app.use(express.static(path.resolve(__dirname)));
     app.get('*', (req, res) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      res.sendFile(path.resolve(__dirname, 'index.html'));
     });
   }
 

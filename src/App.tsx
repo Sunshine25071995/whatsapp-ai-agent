@@ -12,9 +12,12 @@ import {
   Settings,
   CheckCircle2,
   Loader2,
-  Terminal
+  Terminal,
+  Menu,
+  X,
+  AlertCircle
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const socket = io();
 
@@ -22,9 +25,12 @@ export default function App() {
   const [logs, setLogs] = useState<any[]>([]);
   const [status, setStatus] = useState<'open' | 'connecting' | 'close'>('close');
   const [qr, setQr] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [geminiAvailable, setGeminiAvailable] = useState<boolean | null>(null);
   
   useEffect(() => {
     socket.on('status', (data) => setStatus(data.status));
+    socket.on('system-info', (data) => setGeminiAvailable(data.geminiAvailable));
     socket.on('qr', (data) => setQr(data));
     socket.on('message', (msg) => {
       setLogs(prev => {
@@ -46,7 +52,78 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-indigo-500/30">
-      {/* Sidebar */}
+      {/* Mobile Header */}
+      <div className="lg:hidden flex items-center justify-between p-4 bg-slate-900/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+            <Bot className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-bold tracking-tight">Gemini Bot</span>
+        </div>
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+        >
+          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {/* Mobile Drawer Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
+            />
+            <motion.aside 
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed left-0 top-0 bottom-0 w-72 bg-slate-900 z-[70] p-6 lg:hidden flex flex-col shadow-2xl"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20">
+                    <Bot className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="font-bold text-lg tracking-tight">Gemini Bot</h1>
+                    <p className="text-[10px] text-slate-500 font-medium uppercase tracking-widest">WhatsApp Agent</p>
+                  </div>
+                </div>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden p-1 hover:bg-white/5 rounded-lg">
+                  <X className="w-5 h-5 text-slate-400" />
+                </button>
+              </div>
+
+              <nav className="flex-1 space-y-1">
+                <NavItem icon={Activity} label="Overview" active onClick={() => setIsMobileMenuOpen(false)} />
+                <NavItem icon={MessageSquare} label="Live Chats" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavItem icon={History} label="History" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavItem icon={Shield} label="Security" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavItem icon={Settings} label="Settings" onClick={() => setIsMobileMenuOpen(false)} />
+              </nav>
+
+              <div className="mt-8 space-y-4">
+                <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
+                  <p className="text-xs text-slate-400 mb-2">Service Status</p>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded-full ${status === 'open' ? 'bg-emerald-500' : status === 'connecting' ? 'bg-amber-500' : 'bg-rose-500'} animate-pulse`} />
+                    <span className="text-sm font-medium capitalize">{status}</span>
+                  </div>
+                </div>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop Sidebar */}
       <aside className="fixed left-0 top-0 bottom-0 w-64 bg-slate-900/50 border-r border-white/5 p-6 hidden lg:flex flex-col">
         <div className="flex items-center gap-3 mb-10">
           <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/20">
@@ -90,6 +167,13 @@ export default function App() {
               <div className={`w-3 h-3 rounded-full ${status === 'open' ? 'bg-emerald-500' : 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]'}`} />
               <span className="font-bold text-sm tracking-wide uppercase">{status === 'open' ? 'System Live' : 'System Offline'}</span>
             </div>
+            
+            {geminiAvailable === false && (
+              <div className="px-6 py-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-3">
+                <AlertCircle className="w-4 h-4 text-rose-500" />
+                <span className="font-bold text-sm text-rose-500 tracking-wide uppercase">AI Key Missing</span>
+              </div>
+            )}
           </div>
         </header>
 
@@ -201,9 +285,11 @@ export default function App() {
   );
 }
 
-function NavItem({ icon: Icon, label, active = false }: any) {
+function NavItem({ icon: Icon, label, active = false, onClick }: any) {
   return (
-    <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+    <button 
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
       active 
         ? 'bg-indigo-600/10 text-indigo-400 border border-indigo-500/20' 
         : 'text-slate-500 hover:text-slate-200 hover:bg-white/5 border border-transparent'
