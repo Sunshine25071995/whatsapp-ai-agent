@@ -1,0 +1,6 @@
+{
+  "name": "Gemini WhatsApp Agent",
+  "description": "A personal AI agent for WhatsApp powered by Gemini. Link your account and let the AI handle your chats.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
