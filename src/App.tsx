@@ -80,27 +80,28 @@ export default function App() {
       };
       
       setLogs(prev => {
-        // Use a more robust check for duplicates
-        if (prev.some(l => l.id === msg.id)) return prev;
+        if (prev.some(l => l.id === msg.id)) {
+          console.log('Duplicate message detected:', msg.id);
+          return prev;
+        }
         return [newLog, ...prev].slice(0, 50);
       });
 
       if (isAiEnabled && aiRef.current) {
         try {
-          // Get or create history for this user
           const history = chatHistories.current.get(msg.from) || [];
           
-          const model = aiRef.current.getGenerativeModel({ 
+          // Using the new @google/genai SDK methods
+          const chat = aiRef.current.chats.create({
             model: "gemini-1.5-flash",
-            systemInstruction: systemPrompt
-          });
-
-          const chat = model.startChat({
+            config: {
+              systemInstruction: systemPrompt
+            },
             history: history
           });
 
-          const result = await chat.sendMessage(msg.text);
-          const replyText = result.response.text() || "I'm sorry, I couldn't generate a response.";
+          const result = await chat.sendMessage({ message: msg.text });
+          const replyText = result.text || "I'm sorry, I couldn't generate a response.";
 
           // Update local history (keep last 10 messages for memory)
           const updatedHistory = [

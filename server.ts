@@ -3,9 +3,9 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import * as Baileys from "@whiskeysockets/baileys";
+import Baileys from "@whiskeysockets/baileys";
+const makeWASocket = (Baileys as any).default || Baileys;
 const { 
-  default: makeWASocket,
   DisconnectReason, 
   fetchLatestBaileysVersion, 
   useMultiFileAuthState, 
@@ -62,7 +62,7 @@ async function startServer() {
         if (shouldReconnect) {
           // Add random jitter to avoid rapid retry cycles
           const delayMs = 5000 + Math.random() * 5000;
-          console.log(`Waiting ${Math.floor(delayMs)}ms before reconnecting...`);
+          console.log(`Connection closed (potential 515 error). Waiting ${Math.floor(delayMs)}ms before reconnecting...`);
           setTimeout(() => {
             connectToWhatsApp();
           }, delayMs);
