@@ -9,7 +9,6 @@ const {
   DisconnectReason, 
   fetchLatestBaileysVersion, 
   useMultiFileAuthState, 
-  makeInMemoryStore,
   jidDecode,
   delay
 } = Baileys as any;
@@ -18,7 +17,6 @@ import pino from "pino";
 import fs from "fs";
 
 const logger = pino({ level: 'silent' });
-const store = makeInMemoryStore({ logger });
 
 async function startServer() {
   const app = express();
@@ -41,8 +39,6 @@ async function startServer() {
       logger,
       browser: ["Gemini Agent", "Chrome", "1.0.0"]
     });
-
-    store.bind(sock.ev);
 
     sock.ev.on('connection.update', (update: any) => {
       const { connection, lastDisconnect, qr } = update;
